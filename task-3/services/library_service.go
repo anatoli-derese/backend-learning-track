@@ -109,7 +109,6 @@ func (lib *Library) ReturnBook(memberID int, bookId int) error {
 }
 
 func (lib *Library) ListAvailableBooks() []*models.Book {
-	// Implement this method
 	var availableBooks []*models.Book
 	for _, book := range lib.Books {
 		if book.Status == "Available" {
