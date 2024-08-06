@@ -32,6 +32,26 @@ func wordCount(input string) map[string]int {
 	return frequency
 
 }
+
+func concatenate(input []string) string {
+	conc := ""
+	for _, val := range input {
+		conc += cleanUp(val)
+	}
+	return conc
+
+}
+
+func checkPalindrome(input string) bool {
+
+	for i := 0; i < len(input)/2; i++ {
+		if input[i] != input[len(input)-i-1] {
+			return false
+		}
+	}
+	return true
+}
+
 func takeInput(prompt string) string {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Printf("%v:", prompt)
@@ -40,7 +60,6 @@ func takeInput(prompt string) string {
 		fmt.Println("Read Op Failed")
 		return ""
 	}
-	fmt.Print(input)
 	return input
 }
 
@@ -48,6 +67,16 @@ func main() {
 	input := takeInput("Insert Sentence for count")
 	myCount := wordCount(input)
 	fmt.Println(myCount)
+
+	input = takeInput("Insert Sentence for palindrome")
+	arrayForm := strings.Split(input, " ")
+	concat := concatenate(arrayForm)
+	answer := checkPalindrome(concat)
+	if answer {
+		fmt.Println("Palindrome")
+	} else {
+		fmt.Println("Not Palindrome")
+	}
 
 	// fmt.(cleanUp("THIS? is:"))
 }
