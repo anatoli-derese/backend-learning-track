@@ -52,7 +52,6 @@ func AddNewTask(c *gin.Context) {
 	newTask.ID = taskID
 
 	tasks = append(tasks, newTask)
-
 	c.IndentedJSON(http.StatusCreated, newTask)
 }
 
@@ -91,14 +90,12 @@ func UpdateTask(c *gin.Context) {
 		if task.ID == intId {
 			tasks[i] = updatedTask
 			tasks[i].ID = intId
-			c.IndentedJSON(http.StatusOK, gin.H{"message": "Task Updated"})
+			c.IndentedJSON(http.StatusOK, tasks[i])
 			return
 		}
 	}
 	updatedTask.ID = taskID
-	tasks = append(tasks, updatedTask)
-	resp := strings.Join([]string{"Task with ID ", id, " not found. A new task has been created with ID :", strconv.Itoa(taskID)}, "")
-	c.IndentedJSON(http.StatusCreated, gin.H{"message": resp})
+	c.IndentedJSON(http.StatusCreated, updatedTask)
 	taskID++
 
 }
