@@ -53,9 +53,7 @@ func AddNewTask(c *gin.Context) {
 
 	tasks = append(tasks, newTask)
 
-	resp := strings.Join([]string{"A new task has been created with ID:", strconv.Itoa(taskID)}, "")
-	taskID++
-	c.IndentedJSON(http.StatusCreated, gin.H{"message": resp})
+	c.IndentedJSON(http.StatusCreated, newTask)
 }
 
 func DeleteTask(c *gin.Context) {
