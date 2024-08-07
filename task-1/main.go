@@ -40,6 +40,10 @@ func (g *GradeReport) calculateAverage() float64 {
 	for _, grade := range g.grades {
 		sum += grade
 	}
+	if len(g.grades) == 0 {
+		fmt.Println("Grades are 0")
+		return 0.0
+	}
 	average := sum / float64(len(g.grades))
 	return average
 }
