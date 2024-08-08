@@ -2,67 +2,51 @@ package data
 
 import (
 	"backend-learning-track/task-4/models"
-	"net/http"
-	"strconv"
-	"strings"
-
-	"github.com/gin-gonic/gin"
+	"errors"
 )
 
-var taskID = 1
+
 
 var tasks []models.Task
 
-func GetAllTask(c *gin.Context) {
+func GetAllTasks() ([]models.Task, error) {
 	if len(tasks) == 0 {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "There are no tasks at the moment! Use the Post Method to add a new task."})
-		return
+		return nil, errors.New("no tasks found")
 	}
-	c.IndentedJSON(http.StatusOK, tasks)
+	return tasks, nil
 }
 
-func GetSpecificTask(intId int, c *gin.Context) {
+func GetSpecificTask(intId int) (models.Task, error) {
 	for _, task := range tasks {
 		if task.ID == intId {
-			c.IndentedJSON(http.StatusOK, task)
-			return
+			return task, nil
 		}
 	}
-	resp := strings.Join([]string{"Task with ID ", strconv.Itoa(intId), " not found."}, "")
-	c.IndentedJSON(http.StatusNotFound, gin.H{"message": resp})
+	return models.Task{}, errors.New("task not found")
 }
 
-func AddNewTask(newTask models.Task, c *gin.Context) {
-	newTask.ID = taskID
+func AddNewTask(newTask models.Task) {
 	tasks = append(tasks, newTask)
-	c.IndentedJSON(http.StatusCreated, newTask)
 }
 
-func DeleteTask(intId int, c *gin.Context) {
-
+func DeleteTask(intId int) error {
 	for i, task := range tasks {
 		if task.ID == intId {
 			tasks = append(tasks[:i], tasks[i+1:]...)
-			c.IndentedJSON(http.StatusOK, gin.H{"message": "Task Deleted"})
-			return
+			return nil
 		}
 	}
-	resp := strings.Join([]string{"Task with ID ", strconv.Itoa(intId), " not found."}, "")
-	c.IndentedJSON(http.StatusNotFound, gin.H{"message": resp})
+	return errors.New("task not found")
 
 }
 
-func UpdateTask(intId int, updatedTask models.Task, c *gin.Context) {
+func UpdateTask(updatedTask models.Task) (int, error) {
 	for i, task := range tasks {
-		if task.ID == intId {
+		if task.ID == updatedTask.ID {
 			tasks[i] = updatedTask
-			tasks[i].ID = intId
-			c.IndentedJSON(http.StatusOK, tasks[i])
-			return
+			return 204, nil
 		}
 	}
-	updatedTask.ID = taskID
-	c.IndentedJSON(http.StatusCreated, updatedTask)
-	taskID++
-
+	tasks = append(tasks, updatedTask)
+	return 201, nil
 }
