@@ -1,62 +1,76 @@
 package controllers
 
 import (
-	"backend-learning-track/task-4/data"
-	"backend-learning-track/task-4/models"
-	"fmt"
+	"backend-learning-track/task-5/data"
+	"backend-learning-track/task-5/models"
 	"net/http"
-	"strconv"
+
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-var taskID int = 1
+type TaskController interface {
+	AddNewTask(c *gin.Context)
+	GetSpecificTask(c *gin.Context)
+	GetAllTask(c *gin.Context)
+	DeleteTask(c *gin.Context)
+	UpdateTask(c *gin.Context)
+}
 
-func AddNewTask(c *gin.Context) {
+type TaskControllerImp struct {
+	service data.TaskService
+}
+
+func NewTaskController(service data.TaskService) *TaskControllerImp {
+	return &TaskControllerImp{service: service}
+}
+
+func (controller *TaskControllerImp) AddNewTask(c *gin.Context) {
 	var newTask models.Task
 	if err := c.BindJSON(&newTask); err != nil {
-		fmt.Println(newTask)
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid Task"})
 		return
 	}
-	newTask.ID = taskID
-	data.AddNewTask(newTask)
-	c.IndentedJSON(http.StatusCreated, newTask)
-	taskID++
+	task, err := controller.service.AddNewTask(newTask)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err})
+		return
+	}
+	c.IndentedJSON(http.StatusCreated, task)
 }
 
-func GetSpecificTask(c *gin.Context) {
+func (controller *TaskControllerImp) GetSpecificTask(c *gin.Context) {
 	id := c.Param("id")
-	intId, err := strconv.Atoi(id)
+	intId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid ID"})
 		return
 	}
-	task, err := data.GetSpecificTask(intId)
+	task, err := controller.service.GetSpecificTask(intId)
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Task not found"})
 		return
 	}
-	c.IndentedJSON(http.StatusOK, task)
+	c.IndentedJSON(http.StatusCreated, task)
 }
 
-func GetAllTask(c *gin.Context) {
-	tasks, err := data.GetAllTasks()
+func (controller *TaskControllerImp) GetAllTasks(c *gin.Context) {
+	tasks, err := controller.service.GetAllTasks()
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "No tasks found, please add a task"})
 		return
 	}
 	c.IndentedJSON(http.StatusOK, tasks)
-
 }
 
-func DeleteTask(c *gin.Context) {
+func (controller *TaskControllerImp) DeleteTask(c *gin.Context) {
 	id := c.Param("id")
-	intId, err := strconv.Atoi(id)
+	intId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid ID"})
 		return
 	}
-	error := data.DeleteTask(intId)
+	error := controller.service.DeleteTask(intId)
 	if error != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Task not found"})
 		return
@@ -64,24 +78,28 @@ func DeleteTask(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "Task deleted successfully"})
 }
 
-func UpdateTask(c *gin.Context) {
+func (controller *TaskControllerImp) UpdateTask(c *gin.Context) {
+
 	id := c.Param("id")
-	intId, err := strconv.Atoi(id)
+	intId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid ID"})
 		return
 	}
 	var updatedTask models.Task
-
 	if err := c.BindJSON(&updatedTask); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid Task"})
 		return
 	}
+
 	updatedTask.ID = intId
-	code, err := data.UpdateTask(updatedTask)
-	if err != nil {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Operation Failed"})
+
+	error := controller.service.UpdateTask(updatedTask)
+
+	if error != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": error})
+		return
 	}
-	c.IndentedJSON(code, updatedTask)
+	c.IndentedJSON(http.StatusAccepted, updatedTask)
 
 }
