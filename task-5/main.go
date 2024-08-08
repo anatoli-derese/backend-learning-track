@@ -12,6 +12,10 @@ import (
 
 func main() {
 	router := gin.Default()
+	
+	Runner(router)
+}
+func DataBaseConnection() {
 	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 
@@ -26,8 +30,9 @@ func main() {
 	}
 
 	fmt.Println("Connected to MongoDB!")
+	collection := client.Database("test").Collection("trainers")
 
-	Runner(router)
+
 }
 
 func Runner(r *gin.Engine) {
