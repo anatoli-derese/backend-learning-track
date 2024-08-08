@@ -51,7 +51,7 @@ func (controller *TaskControllerImp) GetSpecificTask(c *gin.Context) {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Task not found"})
 		return
 	}
-	c.IndentedJSON(http.StatusCreated, task)
+	c.IndentedJSON(http.StatusOK, task)
 }
 
 func (controller *TaskControllerImp) GetAllTasks(c *gin.Context) {

@@ -29,8 +29,6 @@ func NewTaskService(db *mongo.Collection, ctx context.Context) TaskService {
 	return &TaskServiceStruct{db: db, ctx: ctx}
 }
 
-var tasks []models.Task
-
 func (t *TaskServiceStruct) GetAllTasks() ([]models.Task, error) {
 	filter := bson.D{{}}
 	var tasks []models.Task
@@ -51,7 +49,10 @@ func (t *TaskServiceStruct) GetAllTasks() ([]models.Task, error) {
 }
 
 func (t *TaskServiceStruct) GetSpecificTask(intId primitive.ObjectID) (models.Task, error) {
-	filter := bson.D{{"_id", intId}}
+	filter := bson.D{{
+		Key:   "_id",
+		Value: intId,
+	}}
 	var task models.Task
 	err := t.db.FindOne(t.ctx, filter).Decode(&task)
 	if err != nil {
@@ -75,7 +76,7 @@ func (t *TaskServiceStruct) AddNewTask(newTask models.Task) (models.Task, error)
 }
 
 func (t *TaskServiceStruct) DeleteTask(intId primitive.ObjectID) error {
-	filter := bson.D{{"_id", intId}}
+	filter := bson.D{{Key: "_id", Value: intId}}
 	delete, err := t.db.DeleteOne(t.ctx, filter)
 	if err != nil {
 		return err
