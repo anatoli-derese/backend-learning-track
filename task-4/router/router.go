@@ -1,16 +1,16 @@
 package router
 
 import (
-	"backend-learning-track/task-4/data"
+	"backend-learning-track/task-4/controllers"
 
 	"github.com/gin-gonic/gin"
 )
 
 func SetUpRouter(router *gin.Engine) {
-	router.GET("/tasks", data.GetAllTask)
-	router.GET("/tasks/:id", data.GetSpecificTask)
-	router.POST("/tasks", data.AddNewTask)
-	router.PUT("/tasks/:id", data.UpdateTask)
-	router.DELETE("/tasks/:id", data.DeleteTask)
+	router.GET("/tasks", controllers.GetAllTask)
+	router.GET("/tasks/:id", controllers.GetSpecificTask)
+	router.POST("/tasks", controllers.AddNewTask)
+	router.PUT("/tasks/:id", controllers.UpdateTask)
+	router.DELETE("/tasks/:id", controllers.DeleteTask)
 
 }

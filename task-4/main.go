@@ -1,13 +1,18 @@
 package main
 
 import (
-	"backend-learning-track/task-4/controllers"
+	"backend-learning-track/task-4/router"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	router := gin.Default()
-	controllers.Runner(router)
+	Runner(router)
+}
+
+func Runner(r *gin.Engine) {
+	router.SetUpRouter(r)
+	r.Run("localhost:8080")
 
 }

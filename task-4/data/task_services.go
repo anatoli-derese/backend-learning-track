@@ -2,7 +2,6 @@ package data
 
 import (
 	"backend-learning-track/task-4/models"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -19,49 +18,28 @@ func GetAllTask(c *gin.Context) {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "There are no tasks at the moment! Use the Post Method to add a new task."})
 		return
 	}
-
 	c.IndentedJSON(http.StatusOK, tasks)
 }
 
-func GetSpecificTask(c *gin.Context) {
-	id := c.Param("id")
-	intId, err := strconv.Atoi(id)
-	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid ID"})
-		return
-	}
+func GetSpecificTask(intId int, c *gin.Context) {
 	for _, task := range tasks {
 		if task.ID == intId {
 			c.IndentedJSON(http.StatusOK, task)
 			return
 		}
 	}
-	resp := strings.Join([]string{"Task with ID ", id, " not found."}, "")
+	resp := strings.Join([]string{"Task with ID ", strconv.Itoa(intId), " not found."}, "")
 	c.IndentedJSON(http.StatusNotFound, gin.H{"message": resp})
-
 }
 
-func AddNewTask(c *gin.Context) {
-	var newTask models.Task
-
-	if err := c.BindJSON(&newTask); err != nil {
-		fmt.Println(newTask)
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid Task"})
-		return
-	}
+func AddNewTask(newTask models.Task, c *gin.Context) {
 	newTask.ID = taskID
-
 	tasks = append(tasks, newTask)
 	c.IndentedJSON(http.StatusCreated, newTask)
 }
 
-func DeleteTask(c *gin.Context) {
-	id := c.Param("id")
-	intId, err := strconv.Atoi(id)
-	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid ID"})
-		return
-	}
+func DeleteTask(intId int, c *gin.Context) {
+
 	for i, task := range tasks {
 		if task.ID == intId {
 			tasks = append(tasks[:i], tasks[i+1:]...)
@@ -69,23 +47,12 @@ func DeleteTask(c *gin.Context) {
 			return
 		}
 	}
-	resp := strings.Join([]string{"Task with ID ", id, " not found."}, "")
+	resp := strings.Join([]string{"Task with ID ", strconv.Itoa(intId), " not found."}, "")
 	c.IndentedJSON(http.StatusNotFound, gin.H{"message": resp})
 
 }
 
-func UpdateTask(c *gin.Context) {
-	id := c.Param("id")
-	intId, err := strconv.Atoi(id)
-	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid ID"})
-		return
-	}
-	var updatedTask models.Task
-	if err := c.BindJSON(&updatedTask); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid Task"})
-		return
-	}
+func UpdateTask(intId int, updatedTask models.Task, c *gin.Context) {
 	for i, task := range tasks {
 		if task.ID == intId {
 			tasks[i] = updatedTask
